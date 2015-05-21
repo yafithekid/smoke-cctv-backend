@@ -8,8 +8,13 @@ use App\Models\Photo;
 
 class PhotoController extends Controller {
 
+	public function __construct(){
+		$this->middleware('auth',['only'=>['getIndex']]);
+	}
+	
 	public function getIndex(){
-		$photos = Photo::all();
+		$photos = Photo::orderBy('created_at','DESC')->paginate(10);
+		$photos->setPath('/smoke-cctv-backend/public/photo');
 		return view('photo.index',compact('photos'));
 	}
 
@@ -28,6 +33,16 @@ class PhotoController extends Controller {
 			var_dump(Input::all());
 		}
 		
+	}
+
+	public function getDelete($id){
+		Photo::find($id)->delete();
+		return redirect()->back();
+	}
+
+	public function getRead($id){
+		$photo = Photo::find($id);
+		return view('photo.read',compact('photo'));
 	}
 
 }
